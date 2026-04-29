@@ -8,6 +8,7 @@ class Coupon extends Model
 {
     protected $fillable = [
         'code',
+        'code_type',
         'type',
         'value',
         'min_cart_value',
@@ -16,4 +17,14 @@ class Coupon extends Model
         'expires_at',
         'status',
     ];
+
+    public function categories()
+    {
+        return $this->belongsToMany(\App\Models\Category::class);
+    }
+
+    public function brands()
+    {
+        return $this->belongsToMany(\App\Models\Brand::class);
+    }
 }
