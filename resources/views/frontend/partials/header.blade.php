@@ -29,8 +29,44 @@
 
                 <div class="nav-collapse">
                     <ul class="nav">
-                        <li class="active"><a href="#">Home</a></li>
-                        <li><a href="#">About</a></li>
+                        <li><a href="{{ url('/') }}">Home</a></li>
+
+                        @foreach ($categories as $category)
+                            <li class="dropdown">
+                                {{-- Main Category Link --}}
+                                <a href="{{ url('category/' . $category->slug) }}" class="dropdown-toggle"
+                                    data-toggle="dropdown">
+                                    {{ $category->name }}
+                                    @if ($category->children->count())
+                                        <b class="caret"></b>
+                                    @endif
+                                </a>
+
+                                @if ($category->children->count())
+                                    <ul class="dropdown-menu">
+                                        @foreach ($category->children as $child)
+                                            {{-- Child clickable --}}
+                                            <li>
+                                                <a href="{{ url('category/' . $child->slug) }}">
+                                                    <strong>{{ $child->name }}</strong>
+                                                </a>
+                                            </li>
+
+                                            {{-- Sub children --}}
+                                            @foreach ($child->children as $sub)
+                                                <li style="padding-left:15px;">
+                                                    <a href="{{ url('category/' . $sub->slug) }}">
+                                                        - {{ $sub->name }}
+                                                    </a>
+                                                </li>
+                                            @endforeach
+
+                                            <li class="divider"></li>
+                                        @endforeach
+                                    </ul>
+                                @endif
+                            </li>
+                        @endforeach
                     </ul>
 
                     <form class="navbar-search pull-left">
