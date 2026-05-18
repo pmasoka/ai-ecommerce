@@ -21,47 +21,39 @@
     </style>
 
     {{-- ==================== Carousel ==================== --}}
-    <div id="myCarousel" class="carousel slide">
-        <div class="carousel-inner">
-            <div class="item active">
-                <div class="container">
-                    <a href="#">
-                        <img style="width:100%" src="{{ asset('themes/images/carousel/1.png') }}" alt="" />
-                    </a>
-                    <div class="carousel-caption">
-                        <h4>First Thumbnail label</h4>
-                        <p>Banner text</p>
+    <div id="carouselBlk">
+        <div id="myCarousel" class="carousel slide">
+            <div class="carousel-inner">
+
+                @foreach ($sliderBanners as $key => $banner)
+                    <div class="item {{ $key == 0 ? 'active' : '' }}">
+                        <div class="container">
+                            <a href="{{ $banner->link ?? '#' }}">
+                                <img style="width:100%" src="{{ asset('storage/' . $banner->image) }}" alt="">
+                            </a>
+                        </div>
                     </div>
-                </div>
+                @endforeach
+
             </div>
 
-            <div class="item">
-                <div class="container">
-                    <a href="#">
-                        <img style="width:100%" src="{{ asset('themes/images/carousel/2.png') }}" alt="" />
-                    </a>
-                    <div class="carousel-caption">
-                        <h4>Second Thumbnail label</h4>
-                        <p>Banner text</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="item">
-                <div class="container">
-                    <a href="#">
-                        <img style="width:100%" src="{{ asset('themes/images/carousel/3.png') }}" alt="" />
-                    </a>
-                    <div class="carousel-caption">
-                        <h4>Third Thumbnail label</h4>
-                        <p>Banner text</p>
-                    </div>
-                </div>
-            </div>
+            <a class="left carousel-control" href="#myCarousel" data-slide="prev">&lsaquo;</a>
+            <a class="right carousel-control" href="#myCarousel" data-slide="next">&rsaquo;</a>
         </div>
+    </div>
 
-        <a class="left carousel-control" href="#myCarousel" data-slide="prev">&lsaquo;</a>
-        <a class="right carousel-control" href="#myCarousel" data-slide="next">&rsaquo;</a>
+    <div class="container">
+        <div class="row">
+            @foreach ($gridBanners as $banner)
+                <div class="span4">
+                    <div class="thumbnail">
+                        <a href="{{ $banner->link ?? '#' }}">
+                            <img src="{{ asset('storage/' . $banner->image) }}" alt="">
+                        </a>
+                    </div>
+                </div>
+            @endforeach
+        </div>
     </div>
 
     {{-- ==================== Main Body ==================== --}}
@@ -127,52 +119,77 @@
                     <div class="span9">
                         {{-- Featured --}}
                         <div class="well well-small">
-                            <h4>Featured Products</h4>
+                            <h4>
+                                Featured Products
+                                <small class="pull-right">
+                                    {{ $featuredProducts->count() }} featured products
+                                </small>
+                            </h4>
+
                             <div class="row-fluid">
                                 <ul class="thumbnails">
-                                    @for ($i = 1; $i <= 4; $i++)
+                                    @foreach ($featuredProducts as $product)
                                         <li class="span3">
                                             <div class="thumbnail">
                                                 <a href="#">
-                                                    <img src="{{ asset('themes/images/products/b/' . $i . '.jpg') }}"
-                                                        alt="">
+                                                    <img src="{{ asset('storage/' . $product->image) }}" alt="">
                                                 </a>
+
                                                 <div class="caption">
-                                                    <h5>Product name</h5>
-                                                    <h4>
-                                                        <a class="btn" href="#">VIEW</a>
-                                                        <span class="pull-right">Rs.1000</span>
-                                                    </h4>
+                                                    <h5>{{ $product->name }}</h5>
                                                 </div>
+
+                                                <h4>
+                                                    <a class="btn" href="#">
+                                                        VIEW
+                                                    </a>
+                                                    <span class="pull-right">
+                                                        $ .{{ $product->sale_price ?? $product->price }}
+                                                    </span>
+                                                </h4>
                                             </div>
                                         </li>
-                                    @endfor
+                                    @endforeach
                                 </ul>
                             </div>
                         </div>
-
                         {{-- Latest --}}
                         <div class="well well-small">
                             <h4>Latest Products</h4>
                             <ul class="thumbnails">
-                                @for ($i = 6; $i <= 9; $i++)
+                                @foreach ($latestProducts as $product)
                                     <li class="span3">
                                         <div class="thumbnail">
                                             <a href="#">
-                                                <img src="{{ asset('themes/images/products/' . $i . '.jpg') }}"
-                                                    alt="">
+                                                <img src="{{ asset('storage/' . $product->image) }}" alt="">
                                             </a>
+
                                             <div class="caption">
-                                                <h5>Product name</h5>
-                                                <p>Lorem Ipsum is simply dummy text.</p>
-                                                <h4 style="text-align:center">
-                                                    <a class="btn btn-primary" href="#">Rs.1000</a>
-                                                </h4>
+                                                <h5>{{ $product->name }}</h5>
+                                                <p>
+                                                    {{ Str::limit($product->short_description, 50) }}
+                                                </p>
                                             </div>
+
+                                            <h4 style="text-align:center">
+                                                <a class="btn" href="#">
+                                                    <i class="icon-zoom-in"></i>
+                                                </a>
+
+                                                <a class="btn" href="#">
+                                                    Add to
+                                                    <i class="icon-shopping-cart"></i>
+                                                </a>
+
+                                                <a class="btn btn-primary" href="#">
+                                                    $ .{{ $product->sale_price ?? $product->price }}
+                                                </a>
+                                            </h4>
                                         </div>
                                     </li>
-                                @endfor
+                                @endforeach
                             </ul>
+
                         </div>
                     </div>
                 </div>

@@ -62,4 +62,9 @@ class Product extends Model
     {
         return $this->belongsToMany(\App\Models\AttributeValue::class);
     }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', 1);
+    }
 }
