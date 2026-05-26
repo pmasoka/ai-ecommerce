@@ -144,7 +144,7 @@
                                                         VIEW
                                                     </a>
                                                     <span class="pull-right">
-                                                        $ .{{ $product->sale_price ?? $product->price }}
+                                                        $ {{ $product->sale_price ?? $product->price }}
                                                     </span>
                                                 </h4>
                                             </div>
@@ -182,7 +182,7 @@
                                                 </a>
 
                                                 <a class="btn btn-primary" href="#">
-                                                    $ .{{ $product->sale_price ?? $product->price }}
+                                                    $ {{ $product->sale_price ?? $product->price }}
                                                 </a>
                                             </h4>
                                         </div>

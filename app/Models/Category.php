@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 class Category extends Model
 {
@@ -13,7 +12,6 @@ class Category extends Model
         'slug',
         'description',
         'image',
-        'level',
         'position',
         'status',
         'meta_title',
@@ -21,23 +19,41 @@ class Category extends Model
         'meta_keywords',
     ];
 
+    // Parent Category
     public function parent()
     {
         return $this->belongsTo(Category::class, 'parent_id');
     }
 
+    // Children Categories
     public function children()
     {
-        return $this->hasMany(Category::class, 'parent_id');
+        return $this->hasMany(Category::class, 'parent_id')
+            ->where('status', 1)
+            ->orderBy('position');
     }
 
-    protected static function boot()
+    // Category Products
+    public function products()
     {
-        parent::boot();
-        static::creating(function ($category) {
-            if (empty($category->slug)) {
-                $category->slug = Str::slug($category->name);
-            }
-        });
+        return $this->hasMany(Product::class)
+            ->where('status', 1);
+    }
+
+    // Get All Child Category IDs Recursively
+    public function getAllChildrenIds()
+    {
+        $ids = [];
+
+        foreach ($this->children as $child) {
+            $ids[] = $child->id;
+
+            $ids = array_merge(
+                $ids,
+                $child->getAllChildrenIds()
+            );
+        }
+
+        return $ids;
     }
 }
