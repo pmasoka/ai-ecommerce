@@ -25,7 +25,7 @@
                     <span class="icon-bar"></span>
                 </a>
 
-                <a class="brand" href="#">Stack Developers</a>
+                <a class="brand" href="https://www.patrickjmasoka.co.zw/">DelosTech</a>
 
                 <div class="nav-collapse">
                     <ul class="nav">
@@ -34,7 +34,8 @@
                         @foreach ($categories as $category)
                             <li class="dropdown">
                                 {{-- Main Category Link --}}
-                                <a href="{{ url('category/' . $category->slug) }}" class="dropdown-toggle"
+                                <a href="{{ url($category->slug) }}" 
+                                    class="dropdown-toggle"
                                     data-toggle="dropdown">
                                     {{ $category->name }}
                                     @if ($category->children->count())
@@ -47,7 +48,7 @@
                                         @foreach ($category->children as $child)
                                             {{-- Child clickable --}}
                                             <li>
-                                                <a href="{{ url('category/' . $child->slug) }}">
+                                                <a href="{{ url($child->slug) }}">
                                                     <strong>{{ $child->name }}</strong>
                                                 </a>
                                             </li>
@@ -55,7 +56,7 @@
                                             {{-- Sub children --}}
                                             @foreach ($child->children as $sub)
                                                 <li style="padding-left:15px;">
-                                                    <a href="{{ url('category/' . $sub->slug) }}">
+                                                    <a href="{{ url($sub->slug) }}">
                                                         - {{ $sub->name }}
                                                     </a>
                                                 </li>

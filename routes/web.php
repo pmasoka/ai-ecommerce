@@ -5,4 +5,6 @@ use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\CategoryController;
 
 Route::get('/', [HomeController::class, 'index']);
-Route::get('category/{slug}', [CategoryController::class, 'listing']);
+
+Route::get('/{slug}', [CategoryController::class, 'listing'])
+    ->where('slug', '^[A-Za-z0-9-]+$');

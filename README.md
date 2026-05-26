@@ -29,7 +29,8 @@ This project is a full-featured E-commerce system with a strong focus on integra
 ## 🛠️ Tech Stack
 - Laravel
 - MySQL
-- Laravel / Frontend
+- HTML
+- AJAX
 - AI Integrations
 
 ## ⚙️ Installation
