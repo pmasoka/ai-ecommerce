@@ -91,6 +91,40 @@ class ProductService
             });
         }
 
+        /*
+| NEW: Category Filters
+*/
+
+        if (!empty($filters['categories'])) {
+
+            $selectedCategoryIds = [];
+            $categoryFilters = explode(',', $filters['categories']);
+
+            foreach ($categoryFilters as $categoryId) {
+                $filterCategory = \App\Models\Category::find($categoryId);
+
+                if ($filterCategory) {
+
+                    /*
+            | Current Category
+            */
+
+                    $selectedCategoryIds[] = $filterCategory->id;
+
+                    /*
+            | Child Categories
+            */
+
+                    $selectedCategoryIds = array_merge(
+                        $selectedCategoryIds,
+                        $filterCategory->getAllChildrenIds()
+                    );
+                }
+            }
+
+            $query->wherein('category_id', $selectedCategoryIds);
+        }
+
         return $query
             ->latest()
             ->take($limit)

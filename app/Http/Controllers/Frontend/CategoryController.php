@@ -28,29 +28,44 @@ class CategoryController extends Controller
         /*
         | NEW: Filters
         */
+
         $filters = [
             'price' => $request->price,
+            'categories' => $request->categories,
         ];
+
+        /*
+        | NEW: Filter Categories
+        */
+
+        $filterCategories = $this->categoryService
+            ->getFilterCategories($category);
 
         /*
         | UPDATED: Get Category Products
         */
+
         $products = $this->productService
             ->getCategoryProducts($category, $filters);
 
         /*
         | AJAX Request
         */
+
         if ($request->ajax()) {
             return view(
                 'frontend.category.partials.products',
-                compact('products', 'category')
+                compact(
+                    'products',
+                    'category'
+                )
             )->render();
         }
 
         return view('frontend.category.listing', compact(
             'category',
-            'products'
+            'products',
+            'filterCategories'
         ));
     }
 }

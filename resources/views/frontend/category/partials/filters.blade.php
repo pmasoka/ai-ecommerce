@@ -2,6 +2,26 @@
     <h5>Filters</h5>
     <hr>
 
+    {{-- NEW: Categories Filter --}}
+    @if ($filterCategories->count() > 0)
+
+        <h6>Categories</h6>
+
+        @foreach ($filterCategories as $filterCategory)
+            <label class="checkbox">
+
+                <input type="checkbox" class="filter-checkbox category-filter" value="{{ $filterCategory->id }}"
+                    {{ request()->categories && in_array($filterCategory->id, explode(',', request()->categories)) ? 'checked' : '' }}>
+
+                {{ $filterCategory->name }}
+
+            </label>
+        @endforeach
+
+        <hr>
+
+    @endif
+
     {{-- NEW: Price Filter --}}
     <h6>Price</h6>
 

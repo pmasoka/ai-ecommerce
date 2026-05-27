@@ -21,4 +21,18 @@ class CategoryService
             ->where('status', 1)
             ->firstOrFail();
     }
+
+    /*
+NEW: Filter Categories
+
+If current category has children,
+show children.
+
+Otherwise show empty collection.
+*/
+
+    public function getFilterCategories($category)
+    {
+        return $category->children;
+    }
 }
