@@ -71,11 +71,6 @@ class ProductService
             });
         }
 
-        /*
-    |--------------------------------------------------------------------------
-    | Regular Price
-    |--------------------------------------------------------------------------
-    */
         if (!empty($filters['price'])) {
             $prices = explode(',', $filters['price']);
 
@@ -90,10 +85,6 @@ class ProductService
                 }
             });
         }
-
-        /*
-| NEW: Category Filters
-*/
 
         if (!empty($filters['categories'])) {
 
@@ -123,6 +114,13 @@ class ProductService
             }
 
             $query->wherein('category_id', $selectedCategoryIds);
+        }
+
+
+
+        if (!empty($filters['brands'])) {
+            $brands = explode(',', $filters['brands']);
+            $query->whereIn('brand_id', $brands);
         }
 
         return $query

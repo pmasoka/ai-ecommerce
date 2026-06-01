@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Brand;
 use App\Services\Frontend\CategoryService;
 use App\Services\Frontend\ProductService;
 use Illuminate\Http\Request;
@@ -32,6 +33,7 @@ class CategoryController extends Controller
         $filters = [
             'price' => $request->price,
             'categories' => $request->categories,
+            'brands' => $request->brands,
         ];
 
         /*
@@ -42,11 +44,19 @@ class CategoryController extends Controller
             ->getFilterCategories($category);
 
         /*
-        | UPDATED: Get Category Products
+         Get Category Products
         */
 
         $products = $this->productService
             ->getCategoryProducts($category, $filters);
+
+        /*
+        | Get Brands
+        */
+
+        $brands = Brand::where('status', 1)
+            ->orderBy('name')
+            ->get();
 
         /*
         | AJAX Request
@@ -65,6 +75,7 @@ class CategoryController extends Controller
         return view('frontend.category.listing', compact(
             'category',
             'products',
+            'brands',
             'filterCategories'
         ));
     }

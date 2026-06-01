@@ -22,6 +22,29 @@
 
     @endif
 
+    {{-- Brand Filters --}}
+    @if ($brands->count() > 0)
+        <h6>Brands</h6>
+
+        @foreach ($brands as $brand)
+            <label class="checkbox">
+                <input type="checkbox" class="filter-checkbox brand-filter" value="{{ $brand->id }}"
+                    {{ request()->brands && in_array($brand->id, explode(',', request()->brands)) ? 'checked' : '' }}>
+                {{ $brand->name }}
+            </label>
+        @endforeach
+    @endif
+
+    <hr>
+
+    <?php
+    
+    if (!empty($filters['brands'])) {
+        $brands = explode(',', $filters['brands']);
+        $query->whereIn('brand_id', $brands);
+    }
+    ?>
+
     {{-- NEW: Price Filter --}}
     <h6>Price</h6>
 
