@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
+use App\Models\ProductVariant;
 use App\Services\Frontend\CategoryService;
 use App\Services\Frontend\ProductService;
 use Illuminate\Http\Request;
@@ -34,6 +35,7 @@ class CategoryController extends Controller
             'price' => $request->price,
             'categories' => $request->categories,
             'brands' => $request->brands,
+            'sizes' => $request->sizes,
         ];
 
         /*
@@ -59,6 +61,16 @@ class CategoryController extends Controller
             ->get();
 
         /*
+NEW: Sizes
+*/
+
+        $sizes = ProductVariant::where('status', 1)
+            ->select('size')
+            ->distinct()
+            ->orderBy('size')
+            ->get();
+
+        /*
         | AJAX Request
         */
 
@@ -76,6 +88,7 @@ class CategoryController extends Controller
             'category',
             'products',
             'brands',
+            'sizes',
             'filterCategories'
         ));
     }

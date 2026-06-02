@@ -116,7 +116,18 @@ class ProductService
             $query->wherein('category_id', $selectedCategoryIds);
         }
 
+        /*
+NEW: Size Filters
+*/
 
+        if (!empty($filters['sizes'])) {
+            $sizes = explode(',', $filters['sizes']);
+
+            $query->whereHas('variants', function ($variantQuery) use ($sizes) {
+                $variantQuery->whereIn('size', $sizes)
+                    ->where('status', 1);
+            });
+        }
 
         if (!empty($filters['brands'])) {
             $brands = explode(',', $filters['brands']);

@@ -45,6 +45,21 @@
     }
     ?>
 
+    {{-- NEW: Size Filters --}}
+    @if ($sizes->count() > 0)
+        <h6>Sizes</h6>
+
+        @foreach ($sizes as $size)
+            <label class="checkbox">
+                <input type="checkbox" class="filter-checkbox size-filter" value="{{ $size->size }}"
+                    {{ request()->sizes && in_array($size->size, explode(',', request()->sizes)) ? 'checked' : '' }}>
+                {{ $size->size }}
+            </label>
+        @endforeach
+
+        <hr>
+    @endif
+
     {{-- NEW: Price Filter --}}
     <h6>Price</h6>
 
