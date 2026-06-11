@@ -7,6 +7,7 @@ use App\Models\Brand;
 use App\Models\ProductVariant;
 use App\Services\Frontend\CategoryService;
 use App\Services\Frontend\ProductService;
+use App\Models\Attribute;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -36,6 +37,7 @@ class CategoryController extends Controller
             'categories' => $request->categories,
             'brands' => $request->brands,
             'sizes' => $request->sizes,
+            'attribute_values' => $request->attribute_values,
         ];
 
         /*
@@ -71,6 +73,24 @@ NEW: Sizes
             ->get();
 
         /*
+NEW: Dynamic Attributes
+
+Show only attributes and values
+assigned to products
+*/
+
+        $attributes = Attribute::where('status', 1)
+            ->whereHas('values.products')
+            ->with([
+                'values' => function ($query) {
+                    $query->whereHas('products')
+                        ->orderBy('value');
+                }
+            ])
+            ->orderBy('name')
+            ->get();
+
+        /*
         | AJAX Request
         */
 
@@ -89,7 +109,8 @@ NEW: Sizes
             'products',
             'brands',
             'sizes',
-            'filterCategories'
+            'filterCategories',
+            'attributes',
         ));
     }
 }

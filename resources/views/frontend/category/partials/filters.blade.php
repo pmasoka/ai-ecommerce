@@ -60,6 +60,32 @@
         <hr>
     @endif
 
+    {{-- NEW: Dynamic Attribute Filters --}}
+    @if ($attributes->count() > 0)
+
+        @foreach ($attributes as $attribute)
+            @if ($attribute->values->count() > 0)
+                <h6>{{ $attribute->name }}</h6>
+
+                @foreach ($attribute->values as $value)
+                    <label class="checkbox">
+
+                        <input type="checkbox" class="filter-checkbox attribute-filter" value="{{ $value->id }}"
+                            {{ request()->attribute_values && in_array($value->id, explode(',', request()->attribute_values))
+                                ? 'checked'
+                                : '' }}>
+
+                        {{ $value->value }}
+
+                    </label>
+                @endforeach
+
+                <hr>
+            @endif
+        @endforeach
+
+    @endif
+
     {{-- NEW: Price Filter --}}
     <h6>Price</h6>
 

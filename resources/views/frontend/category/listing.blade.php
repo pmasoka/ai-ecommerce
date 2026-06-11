@@ -48,12 +48,25 @@
                 loadProducts();
             });
 
+            /*
+            |--------------------------------------------------------------------------
+            | NEW: Dynamic Attribute Filter Change
+            |--------------------------------------------------------------------------
+            */
+
+            $(document).on('change', '.attribute-filter', function() {
+
+                loadProducts();
+
+            });
+
             /* NEW: Load Products Using AJAX */
             function loadProducts() {
                 let prices = [];
                 let categories = [];
                 let brands = [];
                 let sizes = [];
+                let attributes = [];
 
                 /* NEW: Selected Prices */
                 $('.price-filter:checked').each(function() {
@@ -71,12 +84,22 @@
                 });
 
                 /*
-             NEW: Selected Sizes
-           
-            */
+                     NEW: Selected Sizes
+                   
+                    */
 
                 $('.size-filter:checked').each(function() {
                     sizes.push($(this).val());
+                });
+
+                /*
+        |--------------------------------------------------------------------------
+        | NEW: Selected Attributes
+        |--------------------------------------------------------------------------
+        */
+
+                $('.attribute-filter:checked').each(function() {
+                    attributes.push($(this).val());
                 });
 
                 /* NEW: Build SEO Friendly URL */
@@ -98,11 +121,21 @@
                 }
 
                 /*
-    NEW: Multiple Size Filters
-    */
+                NEW: Multiple Size Filters
+                */
 
                 if (sizes.length > 0) {
                     params.set('sizes', sizes.join(','));
+                }
+
+                /*
+    |--------------------------------------------------------------------------
+    | NEW: Multiple Dynamic Attribute Filters
+    |--------------------------------------------------------------------------
+    */
+
+                if (attributes.length > 0) {
+                    params.set('attribute_values', attributes.join(','));
                 }
 
                 let newUrl = window.location.pathname + '?' + params.toString();
