@@ -131,7 +131,7 @@
                                     @foreach ($featuredProducts as $product)
                                         <li class="span3">
                                             <div class="thumbnail">
-                                                <a href="#">
+                                                <a href="{{ url('product/' . $product->slug) }}">
                                                     <img src="{{ asset('storage/' . $product->image) }}" alt="">
                                                 </a>
 
@@ -140,7 +140,7 @@
                                                 </div>
 
                                                 <h4>
-                                                    <a class="btn" href="#">
+                                                    <a class="btn" href="{{ url('product/' . $product->slug) }}"">
                                                         VIEW
                                                     </a>
                                                     <span class="pull-right">
@@ -160,7 +160,7 @@
                                 @foreach ($latestProducts as $product)
                                     <li class="span3">
                                         <div class="thumbnail">
-                                            <a href="#">
+                                            <a href="{{ url('product/' . $product->slug) }}">
                                                 <img src="{{ asset('storage/' . $product->image) }}" alt="">
                                             </a>
 
@@ -172,16 +172,16 @@
                                             </div>
 
                                             <h4 style="text-align:center">
-                                                <a class="btn" href="#">
+                                                <a class="btn" href="{{ url('product/' . $product->slug) }}">
                                                     <i class="icon-zoom-in"></i>
                                                 </a>
 
-                                                <a class="btn" href="#">
+                                                <a class="btn" href="{{ url('product/' . $product->slug) }}">
                                                     Add to
                                                     <i class="icon-shopping-cart"></i>
                                                 </a>
 
-                                                <a class="btn btn-primary" href="#">
+                                                <a class="btn btn-primary" href="{{ url('product/' . $product->slug) }}">
                                                     $ {{ $product->sale_price ?? $product->price }}
                                                 </a>
                                             </h4>
