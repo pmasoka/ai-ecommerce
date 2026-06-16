@@ -23,6 +23,12 @@ class ProductsTable
                     ->searchable(),
                 TextColumn::make('slug')
                     ->searchable(),
+                TextColumn::make('product_family')
+                    ->label('Product Family')
+                    ->searchable(),
+                TextColumn::make('color')
+                    ->label('Color')
+                    ->searchable(),
                 TextColumn::make('price')
                     ->money()
                     ->sortable(),

@@ -35,6 +35,16 @@ class ProductForm
                         TextInput::make('slug')
                             ->required(),
 
+                        TextInput::make('product_family')
+                            ->label('Product Family')
+                            ->helperText('Example: IPHONE15')
+                            ->required(),
+
+                        TextInput::make('color')
+                            ->label('Product Color')
+                            ->placeholder('Example: Black')
+                            ->required(),
+
                         Select::make('category_id')
                             ->label('Category')
                             ->options(CategoryForm::getCategoryOptions())

@@ -184,4 +184,17 @@ NEW: Size Filters
             ->take($limit)
             ->get();
     }
+
+    /**
+     * Product Color Variations
+     */
+
+    public function getProductColorVariations($product)
+    {
+        return Product::with('brand')
+            ->where('product_family', $product->product_family)
+            ->where('id', '!=', $product->id)
+            ->where('status', 1)
+            ->get();
+    }
 }
