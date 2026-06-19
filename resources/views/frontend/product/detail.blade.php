@@ -20,10 +20,11 @@
             <div class="row">
                 {{-- Product Images --}}
                 <div class="span5">
+
                     {{-- Main Image --}}
                     <div class="thumbnail">
                         <img id="mainProductImage" src="{{ asset('storage/' . $product->image) }}"
-                            alt="{{ $product->name }}">
+                            data-zoom-image="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}">
                     </div>
 
                     {{-- Gallery Images --}}
@@ -237,22 +238,73 @@
 @endpush
 
 @push('scripts')
+    <script src="{{ asset('js/frontend/jquery.elevatezoom.js') }}"></script>
+
     <script>
         $(document).ready(function() {
+
             /*
-            |--------------------------------------------------------------------------
-            | Change Product Image
-            |--------------------------------------------------------------------------
+        |--------------------------------------
+        | Initialize Zoom
+        |--------------------------------------
+        */
+
+            function initZoom() {
+                $('#mainProductImage').elevateZoom({
+                    zoomType: "lens",
+                    lensShape: "round",
+                    lensSize: 200,
+                    scrollZoom: true
+                });
+            }
+
+            /*
+            |--------------------------------------
+            | Load Initial Zoom
+            |--------------------------------------
             */
+
+            initZoom();
+
+            /*
+    |--------------------------------------
+    | Change Product Image
+    |--------------------------------------
+    */
+
             $('.changeImage').click(function() {
                 let image = $(this).data('image');
 
-                /* Update Main Image */
+                /*
+                |--------------------------------------
+                | Change Main Image
+                |--------------------------------------
+                */
+
                 $('#mainProductImage').attr('src', image);
 
-                /* Active Thumbnail */
+                /*
+                |--------------------------------------
+                | Update Zoom Image
+                |--------------------------------------
+                */
+
+                let ez = $('#mainProductImage').data('elevateZoom');
+
+                if (ez) {
+                    ez.swaptheimage(image, image);
+                }
+
+                /*
+                |--------------------------------------
+                | Active Thumbnail
+                |--------------------------------------
+                */
+
                 $('.product-thumb').removeClass('active-thumb');
-                $(this).closest('.product-thumb').addClass('active-thumb');
+
+                $(this).closest('.product-thumb')
+                    .addClass('active-thumb');
             });
         });
     </script>
