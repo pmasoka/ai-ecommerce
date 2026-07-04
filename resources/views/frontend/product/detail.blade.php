@@ -23,6 +23,7 @@
                     {{-- Main Image --}}
                     <div class="thumbnail">
                         <img id="mainProductImage" src="{{ asset('storage/' . $product->image) }}"
+                            data-zoom-image="{{ asset('storage/' . $product->image) }}" 
                             alt="{{ $product->name }}">
                     </div>
 
@@ -33,7 +34,9 @@
                             <li class="span1">
                                 <div class="thumbnail product-thumb active-thumb">
                                     <img src="{{ asset('storage/' . $product->image) }}" class="changeImage"
-                                        data-image="{{ asset('storage/' . $product->image) }}" alt="">
+                                        data-image="{{ asset('storage/' . $product->image) }}" 
+                                         data-zoom-image="{{ asset('storage/' . $product->image) }}" 
+                                        alt="">
                                 </div>
                             </li>
 
@@ -42,7 +45,8 @@
                                 <li class="span1">
                                     <div class="thumbnail product-thumb">
                                         <img src="{{ asset('storage/' . $image->image) }}" class="changeImage"
-                                            data-image="{{ asset('storage/' . $image->image) }}" alt="">
+                                            data-image="{{ asset('storage/' . $image->image) }}" 
+                                            alt="">
                                     </div>
                                 </li>
                             @endforeach
@@ -237,22 +241,71 @@
 @endpush
 
 @push('scripts')
+    <script src="{{ asset('js/frontend/jquery.elevatezoom.js') }}"></script>
+
     <script>
         $(document).ready(function() {
             /*
-            |--------------------------------------------------------------------------
-            | Change Product Image
-            |--------------------------------------------------------------------------
+        |-----------------------------------------
+        | Initialize Zoom
+        |-----------------------------------------
+        */
+
+            function initZoom() {
+                $('#mainProductImage').elevateZoom({
+                    zoomType: "lens",
+                    lensShape: "round",
+                    lensSize: 200,
+                    scrollZoom: true
+                });
+            }
+
+            /*
+            |-----------------------------------------
+            | Load Initial Zoom
+            |-----------------------------------------
             */
+
+            initZoom();
+
+            /*
+    |-----------------------------------------
+    | Change Product Image
+    |-----------------------------------------
+    */
+
             $('.changeImage').click(function() {
                 let image = $(this).data('image');
 
-                /* Update Main Image */
+                /*
+                |-----------------------------------------
+                | Change Main Image
+                |-----------------------------------------
+                */
+
                 $('#mainProductImage').attr('src', image);
 
-                /* Active Thumbnail */
+                /*
+                |-----------------------------------------
+                | Update Zoom Image
+                |-----------------------------------------
+                */
+
+                let ez = $('#mainProductImage').data('elevateZoom');
+
+                if (ez) {
+                    ez.swaptheimage(image, image);
+                }
+
+                /*
+                |-----------------------------------------
+                | Active Thumbnail
+                |-----------------------------------------
+                */
+
                 $('.product-thumb').removeClass('active-thumb');
-                $(this).closest('.product-thumb').addClass('active-thumb');
+                $(this).closest('.product-thumb')
+                    .addClass('active-thumb');
             });
         });
     </script>
