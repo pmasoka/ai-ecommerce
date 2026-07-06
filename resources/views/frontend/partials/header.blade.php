@@ -34,9 +34,7 @@
                         @foreach ($categories as $category)
                             <li class="dropdown">
                                 {{-- Main Category Link --}}
-                                <a href="{{ url($category->slug) }}" 
-                                    class="dropdown-toggle"
-                                    data-toggle="dropdown">
+                                <a href="{{ url($category->slug) }}" class="dropdown-toggle" data-toggle="dropdown">
                                     {{ $category->name }}
                                     @if ($category->children->count())
                                         <b class="caret"></b>
@@ -75,9 +73,41 @@
                     </form>
 
                     <ul class="nav pull-right">
-                        <li><a href="#">Contact</a></li>
+                        <li>
+                            <a href="#">Contact</a>
+                        </li>
+
                         <li class="divider-vertical"></li>
-                        <li><a href="#">Login</a></li>
+
+                        @guest
+                            <li>
+                                <a href="{{ route('register') }}">Register</a>
+                            </li>
+
+                            <li class="divider-vertical"></li>
+
+                            <li>
+                                <a href="">Login</a>
+                            </li>
+                        @endguest
+
+                        @auth
+                            <li>
+                                <a href="">My Account</a>
+                            </li>
+
+                            <li class="divider-vertical"></li>
+
+                            <li>
+                                <form action="" method="POST" style="display:inline;">
+                                    @csrf
+                                    <button type="submit"
+                                        style="background:none;border:none;padding:0;color:#08c;cursor:pointer;">
+                                        Logout
+                                    </button>
+                                </form>
+                            </li>
+                        @endauth
                     </ul>
                 </div>
 
