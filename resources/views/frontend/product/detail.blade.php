@@ -20,10 +20,10 @@
             <div class="row">
                 {{-- Product Images --}}
                 <div class="span5">
+
                     {{-- Main Image --}}
                     <div class="thumbnail">
                         <img id="mainProductImage" src="{{ asset('storage/' . $product->image) }}"
-                            data-zoom-image="{{ asset('storage/' . $product->image) }}" 
                             alt="{{ $product->name }}">
                     </div>
 
@@ -34,9 +34,8 @@
                             <li class="span1">
                                 <div class="thumbnail product-thumb active-thumb">
                                     <img src="{{ asset('storage/' . $product->image) }}" class="changeImage"
-                                        data-image="{{ asset('storage/' . $product->image) }}" 
-                                         data-zoom-image="{{ asset('storage/' . $product->image) }}" 
-                                        alt="">
+                                        data-image="{{ asset('storage/' . $product->image) }}"
+                                        data-zoom-image="{{ asset('storage/' . $product->image) }}" alt="">
                                 </div>
                             </li>
 
@@ -45,8 +44,7 @@
                                 <li class="span1">
                                     <div class="thumbnail product-thumb">
                                         <img src="{{ asset('storage/' . $image->image) }}" class="changeImage"
-                                            data-image="{{ asset('storage/' . $image->image) }}" 
-                                            alt="">
+                                            data-image="{{ asset('storage/' . $image->image) }}" @ alt="">
                                     </div>
                                 </li>
                             @endforeach
@@ -153,11 +151,18 @@
                     {{-- Variants --}}
                     @if ($product->variants->count())
                         <hr class="soft" />
+
                         <h4>Sizes</h4>
-                        <select class="span3">
+
+                        <select id="variant_id" class="span3">
+                            <option value="">
+                                Select Size
+                            </option>
+
                             @foreach ($product->variants as $variant)
-                                <option>
-                                    {{ $variant->size }} - Rs.{{ number_format($variant->price, 2) }}
+                                <option value="{{ $variant->id }}">
+                                    {{ $variant->size }}
+                                    - Rs.{{ number_format($variant->price, 2) }}
                                 </option>
                             @endforeach
                         </select>
@@ -165,10 +170,25 @@
 
                     {{-- Add To Cart --}}
                     <hr class="soft" />
-                    <button class="btn btn-large btn-primary">
-                        <i class="icon-shopping-cart"></i>
-                        Add To Cart
-                    </button>
+
+                    <form id="addToCartForm">
+                        @csrf
+
+                        <input type="hidden" id="product_id" value="{{ $product->id }}">
+
+                        <div style="margin-bottom:15px;">
+                            <label>
+                                Quantity
+                            </label>
+
+                            <input type="number" id="quantity" value="1" min="1" class="span3">
+                        </div>
+
+                        <button type="button" id="addToCartBtn" class="btn btn-large btn-primary">
+                            <i class="icon-shopping-cart"></i>
+                            Add To Cart
+                        </button>
+                    </form>
 
                     {{-- Attributes --}}
                     @if ($product->attributeValues->count())
@@ -245,67 +265,68 @@
 
     <script>
         $(document).ready(function() {
-            /*
-        |-----------------------------------------
-        | Initialize Zoom
-        |-----------------------------------------
-        */
-
-            function initZoom() {
-                $('#mainProductImage').elevateZoom({
-                    zoomType: "lens",
-                    lensShape: "round",
-                    lensSize: 200,
-                    scrollZoom: true
-                });
-            }
 
             /*
-            |-----------------------------------------
-            | Load Initial Zoom
-            |-----------------------------------------
+            |--------------------------------------------------------------------------
+            | Change Product Image
+            |--------------------------------------------------------------------------
             */
-
-            initZoom();
-
-            /*
-    |-----------------------------------------
-    | Change Product Image
-    |-----------------------------------------
-    */
-
             $('.changeImage').click(function() {
                 let image = $(this).data('image');
 
-                /*
-                |-----------------------------------------
-                | Change Main Image
-                |-----------------------------------------
-                */
-
+                /* Update Main Image */
                 $('#mainProductImage').attr('src', image);
 
+                /* Active Thumbnail */
+                $('.product-thumb').removeClass('active-thumb');
+                $(this).closest('.product-thumb').addClass('active-thumb');
+            });
+
+            /*
+    |--------------------------------------------------------------------------
+    | Add To Cart
+    |--------------------------------------------------------------------------
+    */
+
+            $('#addToCartBtn').click(function() {
+                let product_id = $('#product_id').val();
+                let variant_id = $('#variant_id').val();
+                let quantity = $('#quantity').val();
+
                 /*
-                |-----------------------------------------
-                | Update Zoom Image
-                |-----------------------------------------
+                |--------------------------------------------------------------------------
+                | Validate Size Selection
+                |--------------------------------------------------------------------------
                 */
 
-                let ez = $('#mainProductImage').data('elevateZoom');
-
-                if (ez) {
-                    ez.swaptheimage(image, image);
+                if ($('#variant_id').length && variant_id == '') {
+                    alert('Please select size.');
+                    return false;
                 }
 
-                /*
-                |-----------------------------------------
-                | Active Thumbnail
-                |-----------------------------------------
-                */
-
-                $('.product-thumb').removeClass('active-thumb');
-                $(this).closest('.product-thumb')
-                    .addClass('active-thumb');
+                $.ajax({
+                    url: "{{ route('cart.add') }}",
+                    type: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        product_id: product_id,
+                        variant_id: variant_id,
+                        quantity: quantity
+                    },
+                    beforeSend: function() {
+                        $('#addToCartBtn')
+                            .prop('disabled', true)
+                            .text('Adding...');
+                    },
+                    success: function(response) {
+                        alert(response.message);
+                    },
+                    complete: function() {
+                        $('#addToCartBtn')
+                            .prop('disabled', false)
+                            .html('<i class="icon-shopping-cart"></i> Add To Cart');
+                    }
+                });
             });
         });
     </script>
