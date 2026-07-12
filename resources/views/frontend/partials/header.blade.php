@@ -87,31 +87,39 @@
                             <li class="divider-vertical"></li>
 
                             <li>
-                                <a href="">Login</a>
+                                <a href="{{ route('login') }}">
+                                    Login
+                                </a>
                             </li>
-                        @endguest
+
+
 
                         @auth
                             <li>
-                                <a href="">My Account</a>
-                            </li>
-
-                            <li class="divider-vertical"></li>
-
-                            <li>
-                                <form action="" method="POST" style="display:inline;">
-                                    @csrf
-                                    <button type="submit"
-                                        style="background:none;border:none;padding:0;color:#08c;cursor:pointer;">
-                                        Logout
-                                    </button>
-                                </form>
+                                <a href="#">
+                                    {{ Auth::user()->name }}
+                                </a>
                             </li>
                         @endauth
-                    </ul>
-                </div>
+                    @endguest
 
+                    @auth
+                        <li>
+                            <a href="">My Account</a>
+                        </li>
+
+                        <li class="divider-vertical"></li>
+
+                        <li>
+                           
+                            <a href="">Logout</a>
+                        
+                        </li>
+                    @endauth
+                </ul>
             </div>
+
         </div>
     </div>
+</div>
 </section>
