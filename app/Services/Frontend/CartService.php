@@ -11,17 +11,23 @@ class CartService
 {
     public function add($data)
     {
+        /*
+     * Product
+     */
         $product = Product::findOrFail(
             $data['product_id']
         );
 
+        /*
+     * Variant Validation
+     */
         $variant = null;
 
         if (!empty($data['variant_id'])) {
             $variant = ProductVariant::findOrFail(
                 $data['variant_id']
             );
-        };
+        }
 
         if (
             $variant->stock < $data['quantity']
@@ -32,35 +38,49 @@ class CartService
         }
 
         /*
-        |--------------------------------------------------------------------------
-        | Logged In User
-        |--------------------------------------------------------------------------
-        */
-
+     * Logged In User
+     */
         if (Auth::check()) {
-            $cartItem = CartItem::firstOrNew([
-                'user_id' => Auth::id(),
-                'product_id' => $product->id,
-                'product_variant_id' => $data['variant_id'] ?? null,
-            ]);
+            $cartItem = CartItem::where(
+                'user_id',
+                Auth::id()
+            )
+                ->where(
+                    'product_id',
+                    $product->id
+                )
+                ->where(
+                    'product_variant_id',
+                    $data['variant_id'] ?? null
+                )
+                ->first();
 
-            if ($cartItem->exists) {
+            if ($cartItem) {
                 $cartItem->quantity += $data['quantity'];
+                $cartItem->save();
             } else {
-                $cartItem->quantity = $data['quantity'];
+                CartItem::create([
+                    'user_id' => Auth::id(),
+                    'product_id' => $product->id,
+                    'product_variant_id' => $data['variant_id'] ?? null,
+                    'name' => $product->name,
+                    'image' => $product->image,
+                    'price' => $variant
+                        ? $variant->price
+                        : (
+                            $product->sale_price
+                            ?? $product->price
+                        ),
+                    'quantity' => $data['quantity'],
+                ]);
             }
-
-            $cartItem->save();
 
             return true;
         }
 
         /*
-        |--------------------------------------------------------------------------
-        | Guest User
-        |--------------------------------------------------------------------------
-        */
-
+     * Guest User
+     */
         $cart = session()->get(
             'cart',
             []
@@ -73,18 +93,100 @@ class CartService
         } else {
             $cart[$key] = [
                 'product_id' => $product->id,
-                'variant_id' => $data['variant_id'] ?? null,
+                'product_variant_id' => $data['variant_id'] ?? null,
                 'name' => $product->name,
                 'image' => $product->image,
                 'price' => $variant
-                    ? ($product->sale_price ?? $product->price)
-                    : $product->price,
+                    ? $variant->price
+                    : (
+                        $product->sale_price
+                        ?? $product->price
+                    ),
                 'quantity' => $data['quantity'],
             ];
         }
 
-        session()->put('cart', $cart);
+        session()->put(
+            'cart',
+            $cart
+        );
 
         return true;
+    }
+
+    /*
+|-------------------------
+| Move Session Cart To Database
+|-------------------------
+*/
+
+    public function moveSessionCartToDatabase()
+    {
+        /*
+    |-------------------------
+    | User Authentication
+    |-------------------------
+    */
+        if (!Auth::check()) {
+            return;
+        }
+
+        /*
+    |-------------------------
+    | Get Session Cart
+    |-------------------------
+    */
+        $cart = session('cart', []);
+
+        /*
+    |-------------------------
+    | Empty Cart
+    |-------------------------
+    */
+        if (empty($cart)) {
+            return;
+        }
+
+        /*
+    |-------------------------
+    | Save Cart Items
+    |-------------------------
+    */
+        foreach ($cart as $item) {
+            $cartItem = CartItem::where('user_id', Auth::id())
+                ->where('product_variant_id', $item['product_variant_id'])
+                ->first();
+
+            /*
+        |-------------------------
+        | Existing Product
+        |-------------------------
+        */
+            if ($cartItem) {
+                $cartItem->increment(
+                    'quantity',
+                    $item['quantity']
+                );
+            }
+            /*
+        |-------------------------
+        | New Product
+        |-------------------------
+        */ else {
+                CartItem::create([
+                    'user_id' => Auth::id(),
+                    'product_id' => $item['product_id'],
+                    'product_variant_id' => $item['product_variant_id'],
+                    'quantity' => $item['quantity'],
+                ]);
+            }
+        }
+
+        /*
+    |-------------------------
+    | Clear Session Cart
+    |-------------------------
+    */
+        session()->forget('cart');
     }
 }
