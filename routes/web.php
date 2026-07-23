@@ -34,6 +34,17 @@ Route::post(
     [LoginController::class, 'store']
 )->name('login.store');
 
+/*
+|-------------------------
+| User Logout
+|-------------------------
+*/
+
+Route::post(
+    '/logout',
+    [LoginController::class, 'logout']
+)->name('logout');
+
 Route::get('/product/{slug}', [ProductController::class, 'detail']);
 Route::get('/{slug}', [CategoryController::class, 'listing'])
     ->where('slug', '^[A-Za-z0-9-]+$');

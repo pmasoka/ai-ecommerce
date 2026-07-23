@@ -94,32 +94,40 @@
 
 
 
+                            @auth
+                                <li>
+                                    <a href="#">
+                                        {{ Auth::user()->name }}
+                                    </a>
+                                </li>
+                            @endauth
+                        @endguest
+
                         @auth
                             <li>
-                                <a href="#">
-                                    {{ Auth::user()->name }}
+                                <a href="">My Account</a>
+                            </li>
+
+                            <li class="divider-vertical"></li>
+
+                            <li>
+                                <a href="{{ route('logout') }}"
+                                    onclick="event.preventDefault();
+                                     document.getElementById(
+                                      'logout-form'
+                                       ).submit();">
+                                    Logout
                                 </a>
                             </li>
+
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display:none;">
+                                @csrf
+                            </form>
                         @endauth
-                    @endguest
+                    </ul>
+                </div>
 
-                    @auth
-                        <li>
-                            <a href="">My Account</a>
-                        </li>
-
-                        <li class="divider-vertical"></li>
-
-                        <li>
-                           
-                            <a href="">Logout</a>
-                        
-                        </li>
-                    @endauth
-                </ul>
             </div>
-
         </div>
     </div>
-</div>
 </section>

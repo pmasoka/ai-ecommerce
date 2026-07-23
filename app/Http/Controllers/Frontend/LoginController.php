@@ -55,4 +55,17 @@ class LoginController extends Controller
             ], 422);
         }
     }
+    /*
+|-------------------------
+| User Logout
+|-------------------------
+*/
+
+    public function logout()
+    {
+        $this->loginService
+            ->logout();
+
+        return redirect('/');
+    }
 }

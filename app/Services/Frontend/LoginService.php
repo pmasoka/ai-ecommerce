@@ -28,4 +28,24 @@ class LoginService
 
         return true;
     }
+    /*
+|-------------------------
+| User Logout
+|-------------------------
+*/
+
+    public function logout()
+    {
+        auth()->logout();
+
+        request()
+            ->session()
+            ->invalidate();
+
+        request()
+            ->session()
+            ->regenerateToken();
+
+        return true;
+    }
 }
