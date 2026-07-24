@@ -3,10 +3,15 @@
         <div id="welcomeLine" class="row">
             <div class="span6">Welcome! <strong>User</strong></div>
             <div class="pull-right">
-                <a href="#">
+                <a href="{{ route('cart.index') }}">
                     <span class="btn btn-mini btn-primary">
                         <i class="icon-shopping-cart icon-white"></i>
-                        [ 3 ] Items in your cart
+                        [
+                        <span id="headerCartCount">
+                            {{ $cartCount }}
+                        </span>
+                        ]
+                        Items in your cart
                     </span>
                 </a>
             </div>

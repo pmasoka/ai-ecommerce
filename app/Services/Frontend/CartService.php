@@ -189,4 +189,109 @@ class CartService
     */
         session()->forget('cart');
     }
+
+    /*
+|------------------------------------------------------------
+| Get Cart Items
+|------------------------------------------------------------
+*/
+
+    public function getCartItems()
+    {
+        if (Auth::check()) {
+
+            return CartItem::with([
+                'product',
+                'variant'
+            ])
+                ->where(
+                    'user_id',
+                    Auth::id()
+                )
+                ->get();
+        }
+
+        return collect(
+            session(
+                'cart',
+                []
+            )
+        );
+    }
+
+    /*
+|------------------------------------------------------------
+| Cart Total
+|------------------------------------------------------------
+*/
+
+    public function getCartTotal()
+    {
+        $total = 0;
+
+        if (Auth::check()) {
+            $items = CartItem::with(
+                'product'
+            )
+                ->where(
+                    'user_id',
+                    Auth::id()
+                )
+                ->get();
+
+            foreach ($items as $item) {
+                $price = $item->product->sale_price
+                    ?? $item->product->price;
+
+                $total += $price * $item->quantity;
+            }
+
+            return $total;
+        }
+
+        foreach (
+            session(
+                'cart',
+                []
+            ) as $item
+        ) {
+            $product = Product::find(
+                $item['product_id']
+            );
+
+            if (!$product) {
+                continue;
+            }
+
+            $price = $product->sale_price
+                ?? $product->price;
+
+            $total += $price * $item['quantity'];
+        }
+
+        return $total;
+    }
+
+    public function getCartCount()
+    {
+        if (Auth::check()) {
+            return CartItem::where(
+                'user_id',
+                Auth::id()
+            )->sum('quantity');
+        }
+
+        $count = 0;
+
+        foreach (
+            session(
+                'cart',
+                []
+            ) as $item
+        ) {
+            $count += $item['quantity'];
+        }
+
+        return $count;
+    }
 }

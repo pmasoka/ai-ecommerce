@@ -46,11 +46,23 @@ Route::post(
 )->name('logout');
 
 Route::get('/product/{slug}', [ProductController::class, 'detail']);
-Route::get('/{slug}', [CategoryController::class, 'listing'])
-    ->where('slug', '^[A-Za-z0-9-]+$');
+
+/*
+|------------------------------------------------------------
+| Shopping Cart
+|------------------------------------------------------------
+*/
+
+Route::get(
+    '/cart',
+    [CartController::class, 'index']
+)->name('cart.index');
+
 Route::post(
     '/cart/add',
     [CartController::class, 'add']
 )->name('cart.add');
 
+Route::get('/{slug}', [CategoryController::class, 'listing'])
+    ->where('slug', '^[A-Za-z0-9-]+$');
 

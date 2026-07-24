@@ -2,10 +2,11 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
+use App\Services\Frontend\CartService;
+use App\Services\Frontend\CategoryService;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
-use App\Services\Frontend\CategoryService;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,11 +24,18 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Schema::defaultStringLength(191);
+
         View::composer('*', function ($view) {
             $categoryService = app(CategoryService::class);
             $categories = $categoryService->getHeaderCategories();
 
-            $view->with('categories', $categories);
+            $cartService = app(CartService::class);
+            $cartCount = $cartService->getCartCount();
+
+            $view->with([
+                'categories' => $categories,
+                'cartCount'  => $cartCount,
+            ]);
         });
     }
 }

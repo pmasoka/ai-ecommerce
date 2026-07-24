@@ -283,10 +283,10 @@
             });
 
             /*
-    |--------------------------------------------------------------------------
-    | Add To Cart
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Add To Cart
+        |--------------------------------------------------------------------------
+        */
 
             $('#addToCartBtn').click(function() {
                 let product_id = $('#product_id').val();
@@ -319,7 +319,28 @@
                             .text('Adding...');
                     },
                     success: function(response) {
-                        alert(response.message);
+                        /* 
+                        | Header Cart Count 
+                        */
+                        $('#headerCartCount')
+                            .text(
+                                response.cart_count
+                            );
+
+                        /* 
+                        | Cart Page Count 
+                        */
+                        $('#cartPageCount')
+                            .text(
+                                response.cart_count
+                            );
+
+                        /* 
+                        | Success Message 
+                        */
+                        alert(
+                            response.message
+                        );
                     },
                     complete: function() {
                         $('#addToCartBtn')
