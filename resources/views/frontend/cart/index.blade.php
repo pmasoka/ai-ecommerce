@@ -36,8 +36,11 @@
                                     <th>Product</th>
                                     <th>Description</th>
                                     <th>Quantity</th>
-                                    <th>Price</th>
-                                    <th>Total</th>
+                                    <th>Unit Price</th>
+                                    <th>Sub Total</th>
+                                    <th>
+                                        Action
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -69,13 +72,24 @@
                                             </strong>
                                         </td>
                                         <td>
-                                            {{ $quantity }}
+
+                                            <input type="number" min="1" value="{{ $quantity }}" class="cartQty"
+                                                data-id="{{ auth()->check() ? $item->id : '' }}"
+                                                data-key="{{ auth()->check() ? '' : $cartKey }}">
                                         </td>
                                         <td>
                                             $ {{ number_format($price, 2) }}
                                         </td>
+
+                                        <td class="subTotal" id="subTotal{{ auth()->check() ? $item->id : $cartKey }}">
+                                            $. {{ number_format($subtotal, 2) }}
+                                        </td>
                                         <td>
-                                            $ {{ number_format($subtotal, 2) }}
+                                            <button class="btn btn-danger removeCartItem"
+                                                data-id="{{ auth()->check() ? $item->id : '' }}"
+                                                data-key="{{ auth()->check() ? '' : $cartKey }}">
+                                                Remove
+                                            </button>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -88,7 +102,9 @@
                                     </td>
                                     <td>
                                         <strong>
-                                            $ {{ number_format($cartTotal, 2) }}
+                                            <span id="grandTotal">
+                                                {{ number_format($cartTotal, 2) }}
+                                            </span>
                                         </strong>
                                     </td>
                                 </tr>

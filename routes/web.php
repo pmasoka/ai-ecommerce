@@ -63,6 +63,28 @@ Route::post(
     [CartController::class, 'add']
 )->name('cart.add');
 
+/*
+|------------------------------------------------------------
+| Cart Update
+|------------------------------------------------------------
+*/
+
+Route::post(
+    '/cart/update',
+    [CartController::class, 'update']
+)->name('cart.update');
+
+/*
+|-----------------------
+| Cart Delete
+|-----------------------
+*/
+
+Route::post(
+    '/cart/delete',
+    [CartController::class, 'delete']
+)->name('cart.delete');
+
 Route::get('/{slug}', [CategoryController::class, 'listing'])
     ->where('slug', '^[A-Za-z0-9-]+$');
 

@@ -294,4 +294,101 @@ class CartService
 
         return $count;
     }
+    /*
+|------------------------------------------------------------
+| Update Cart Item
+|------------------------------------------------------------
+*/
+
+    public function updateCartItem(
+        array $data
+    ) {
+        if (Auth::check()) {
+            $cartItem = CartItem::findOrFail(
+                $data['cart_item_id']
+            );
+
+            $cartItem->update([
+                'quantity' =>
+                $data['quantity']
+            ]);
+
+            return [
+                'status' => true,
+                'cart_count' =>
+                $this->getCartCount(),
+                'cart_total' =>
+                number_format(
+                    $this->getCartTotal(),
+                    2
+                ),
+                'cart_item_id' =>
+                $cartItem->id,
+                'quantity' =>
+                $cartItem->quantity,
+            ];
+        }
+
+        // Guest Cart Logic
+    }
+
+    /*
+|------------------------------------------------------------
+| Delete Cart Item
+|------------------------------------------------------------
+*/
+
+    public function deleteCartItem(
+        array $data
+    ) {
+        /*
+    |------------------------------------------------------------
+    | Logged In User
+    |------------------------------------------------------------
+    */
+        if (Auth::check()) {
+            CartItem::findOrFail(
+                $data['cart_item_id']
+            )->delete();
+        }
+
+        /*
+    |------------------------------------------------------------
+    | Guest User
+    |------------------------------------------------------------
+    */ else {
+            $cart =
+                session(
+                    'cart',
+                    []
+                );
+
+            unset(
+                $cart[$data['key']]
+            );
+
+            session()->put(
+                'cart',
+                $cart
+            );
+        }
+
+        /*
+    |------------------------------------------------------------
+    | Return Updated Cart Data
+    |------------------------------------------------------------
+    */
+        return [
+            'status' => true,
+            'cart_count' =>
+            $this->getCartCount(),
+            'cart_total' =>
+            number_format(
+                $this->getCartTotal(),
+                2
+            ),
+            'is_empty' =>
+            $this->getCartCount() == 0,
+        ];
+    }
 }

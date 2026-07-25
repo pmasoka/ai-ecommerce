@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AddToCartRequest;
 use App\Services\Frontend\CartService;
+use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
@@ -35,7 +36,6 @@ class CartController extends Controller
                 'cart_count' => $this->cartService
                     ->getCartCount(),
             ]);
-            
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
@@ -68,6 +68,40 @@ class CartController extends Controller
                 'cartTotal',
                 'cartCount'
             )
+        );
+    }
+
+    /*
+|------------------------------------------------------------
+| Update Cart Item
+|------------------------------------------------------------
+*/
+
+    public function update(
+        Request $request
+    ) {
+        return response()->json(
+            $this->cartService
+                ->updateCartItem(
+                    $request->all()
+                )
+        );
+    }
+
+    /*
+|------------------------------------------------------------
+| Delete Cart Item
+|------------------------------------------------------------
+*/
+
+    public function delete(
+        Request $request
+    ) {
+        return response()->json(
+            $this->cartService
+                ->deleteCartItem(
+                    $request->all()
+                )
         );
     }
 }
