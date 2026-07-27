@@ -57,14 +57,11 @@ $(document).on(
                 | Unit Price
                 |------------------------------------------------------------
                 */
-                let unitPrice =
-                    parseFloat(
-                        row.find('td:eq(3)')
-                            .text()
-                            .replace('$.', '')
-                            .replace(/,/g, '')
-                            .trim()
-                    );
+                let unitPrice = parseFloat(
+                    row.find('td:eq(3)')
+                        .text()
+                        .replace(/[^0-9.]/g, '')
+                );
 
                 /*
                 |------------------------------------------------------------
@@ -95,7 +92,7 @@ $(document).on(
         });
     });
 
-    /*
+/*
 |------------------------------------------------------------
 | Remove Cart Item
 |------------------------------------------------------------
@@ -104,82 +101,80 @@ $(document).on(
 $(document).on(
     'click',
     '.removeCartItem',
-    function ()
-{
-    /*
-    |------------------------------------------------------------
-    | Confirmation Alert
-    |------------------------------------------------------------
-    */
-    if (
-        !confirm(
-            'Are you sure you want to remove this item from cart?'
-        )
-    ) {
-        return false;
-    }
-
-    let button = $(this);
-
-    $.ajax({
-        url: '/cart/delete',
-        type: 'POST',
-        data: {
-            _token:
-                $('meta[name="csrf-token"]')
-                    .attr('content'),
-            cart_item_id:
-                button.data('id'),
-            key:
-                button.data('key')
-        },
-        success: function (
-            response
-        )
-        {
-            /*
-            |------------------------------------------------------------
-            | Remove Row
-            |------------------------------------------------------------
-            */
-            button
-                .closest('tr')
-                .remove();
-
-            /*
-            |------------------------------------------------------------
-            | Update Counts
-            |------------------------------------------------------------
-            */
-            $('#headerCartCount')
-                .text(response.cart_count);
-
-            $('#cartPageCount')
-                .text(response.cart_count);
-
-            /*
-            |------------------------------------------------------------
-            | Update Grand Total
-            |------------------------------------------------------------
-            */
-            $('#grandTotal')
-                .text(response.cart_total);
-
-            /*
-            |------------------------------------------------------------
-            | Empty Cart Message
-            |------------------------------------------------------------
-            */
-            if (
-                response.is_empty
-            ) {
-                $('table.table')
-                    .replaceWith(
-                        '<div class="alert alert-info">' +
-                        'Your cart is empty.' +
-                        '</div>'
-                    );
-            }
+    function () {
+        /*
+        |------------------------------------------------------------
+        | Confirmation Alert
+        |------------------------------------------------------------
+        */
+        if (
+            !confirm(
+                'Are you sure you want to remove this item from cart?'
+            )
+        ) {
+            return false;
         }
+
+        let button = $(this);
+
+        $.ajax({
+            url: '/cart/delete',
+            type: 'POST',
+            data: {
+                _token:
+                    $('meta[name="csrf-token"]')
+                        .attr('content'),
+                cart_item_id:
+                    button.data('id'),
+                key:
+                    button.data('key')
+            },
+            success: function (
+                response
+            ) {
+                /*
+                |------------------------------------------------------------
+                | Remove Row
+                |------------------------------------------------------------
+                */
+                button
+                    .closest('tr')
+                    .remove();
+
+                /*
+                |------------------------------------------------------------
+                | Update Counts
+                |------------------------------------------------------------
+                */
+                $('#headerCartCount')
+                    .text(response.cart_count);
+
+                $('#cartPageCount')
+                    .text(response.cart_count);
+
+                /*
+                |------------------------------------------------------------
+                | Update Grand Total
+                |------------------------------------------------------------
+                */
+                $('#grandTotal')
+                    .text(response.cart_total);
+
+                /*
+                |------------------------------------------------------------
+                | Empty Cart Message
+                |------------------------------------------------------------
+                */
+                if (
+                    response.is_empty
+                ) {
+                    $('table.table')
+                        .replaceWith(
+                            '<div class="alert alert-info">' +
+                            'Your cart is empty.' +
+                            '</div>'
+                        );
+                }
+            }
+        });
     });
-});
