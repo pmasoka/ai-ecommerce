@@ -102,79 +102,95 @@ class ProductForm
                     ]),
                 ]),
 
-           //  DESCRIPTION
-Section::make('Description')
-    ->headerActions([
-        Action::make(
-            'generateDescription'
-        )
-        ->label(
-            'Generate Using AI'
-        )
-        ->icon(
-            'heroicon-o-sparkles'
-        )
-        ->action(
-            function (
-                $get,
-                $set
-            ){
-                $productName =
-                    $get('name');
-
-                if (
-                    empty(
-                        $productName
+            //  DESCRIPTION
+            Section::make('Description')
+                ->headerActions([
+                    Action::make(
+                        'generateDescription'
                     )
-                ){
-                    return;
-                }
+                        ->label(
+                            'Generate AI Content'
+                        )
+                        ->icon(
+                            'heroicon-o-sparkles'
+                        )
+                        ->action(
+                            function (
+                                $get,
+                                $set
+                            ) {
+                                $productName =
+                                    $get('name');
 
-                $categoryName = '';
+                                if (
+                                    empty($productName)
+                                ) {
+                                    return;
+                                }
 
-                if (
-                    $get(
-                        'category_id'
+                                $categoryName = '';
+
+                                if (
+                                    $get(
+                                        'category_id'
+                                    )
+                                ) {
+                                    $category =
+                                        \App\Models\Category::find(
+                                            $get(
+                                                'category_id'
+                                            )
+                                        );
+
+                                    $categoryName =
+                                        $category?->name;
+                                }
+
+                                $content =
+                                    app(
+                                        AIService::class
+                                    )
+                                    ->generateProductContent(
+                                        $productName,
+                                        $categoryName
+                                    );
+
+                                if (! isset($content['error'])) {
+                                    $set(
+                                        'description',
+                                        $content['description'] ?? ""
+                                    );
+                                    $set(
+                                        'short_description',
+                                        $content['short_description'] ?? ""
+                                    );
+                                    $set(
+                                        'meta_title',
+                                        $content['meta_title'] ?? ""
+                                    );
+                                    $set(
+                                        'meta_description',
+                                        $content['meta_description'] ?? ""
+                                    );
+                                    $set(
+                                        'meta_keywords',
+                                        $content['meta_keywords'] ?? ""
+                                    );
+                                }
+                            }
+                        ),
+                ])
+                ->schema([
+                    Textarea::make(
+                        'description'
                     )
-                ){
-                    $category =
-                        \App\Models\Category::find(
-                            $get(
-                                'category_id'
-                            )
-                        );
+                        ->rows(6),
 
-                    $categoryName =
-                        $category?->name;
-                }
-
-                $description =
-                    app(
-                        AIService::class
+                    Textarea::make(
+                        'short_description'
                     )
-                    ->generateProductDescription(
-                        $productName,
-                        $categoryName
-                    );
-
-                $set(
-                    'description',
-                    $description
-                );
-            }
-        ),
-    ])
-    ->schema([
-        Textarea::make(
-            'description'
-        )
-        ->rows(6),
-
-        Textarea::make(
-            'short_description'
-        )
-        ->rows(4),
-    ]),
+                        ->rows(4),
+                ]),
 
             // 🔍 SEO
             Section::make('SEO Settings')
