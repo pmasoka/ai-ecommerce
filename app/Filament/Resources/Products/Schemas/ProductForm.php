@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\Products\Schemas;
 
 use App\Filament\Resources\Categories\Schemas\CategoryForm;
+use App\Services\Frontend\AIService;
+use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -100,15 +102,79 @@ class ProductForm
                     ]),
                 ]),
 
-            // 📝 DESCRIPTION
-            Section::make('Description')
-                ->schema([
-                    Textarea::make('description')
-                        ->rows(4),
+           //  DESCRIPTION
+Section::make('Description')
+    ->headerActions([
+        Action::make(
+            'generateDescription'
+        )
+        ->label(
+            'Generate Using AI'
+        )
+        ->icon(
+            'heroicon-o-sparkles'
+        )
+        ->action(
+            function (
+                $get,
+                $set
+            ){
+                $productName =
+                    $get('name');
 
-                    Textarea::make('short_description')
-                        ->rows(4),
-                ]),
+                if (
+                    empty(
+                        $productName
+                    )
+                ){
+                    return;
+                }
+
+                $categoryName = '';
+
+                if (
+                    $get(
+                        'category_id'
+                    )
+                ){
+                    $category =
+                        \App\Models\Category::find(
+                            $get(
+                                'category_id'
+                            )
+                        );
+
+                    $categoryName =
+                        $category?->name;
+                }
+
+                $description =
+                    app(
+                        AIService::class
+                    )
+                    ->generateProductDescription(
+                        $productName,
+                        $categoryName
+                    );
+
+                $set(
+                    'description',
+                    $description
+                );
+            }
+        ),
+    ])
+    ->schema([
+        Textarea::make(
+            'description'
+        )
+        ->rows(6),
+
+        Textarea::make(
+            'short_description'
+        )
+        ->rows(4),
+    ]),
 
             // 🔍 SEO
             Section::make('SEO Settings')
