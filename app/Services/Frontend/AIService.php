@@ -2,6 +2,7 @@
 
 namespace App\Services\Frontend;
 
+use App\Models\AISetting;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -9,7 +10,7 @@ class AIService
 {
     /*
     |--------------------------------------------------------------------------
-    | Generate Product Description
+    | Generate Product content
     |--------------------------------------------------------------------------
     */
 
@@ -17,35 +18,40 @@ class AIService
         string $productName,
         string $categoryName = ""
     ): array {
+        $settings = AISetting::first();
+        $model = $settings?->openai_model ?? 'gpt-4.1-mini';
+        $temperature = $settings?->temperature ?? 0.7;
+        $maxTokens = $settings?->max_tokens ?? 600;
+        $descriptionLength = $settings?->description_length ?? 120;
+        $shortDescriptionLength = $settings?->short_description_length ?? 40;
+        $keywordCount = $settings?->keyword_count ?? 10;
+        $writingTone = $settings?->writing_tone ?? 'Professional';
+        $systemPrompt = $settings?->system_prompt
+            ?? 'You are an expert e-commerce SEO content writer. Return only valid JSON without markdown.';
         try {
             $response = Http::withToken(
                 config('services.openai.key')
             )->post(
                 'https://api.openai.com/v1/chat/completions',
                 [
-                    'model' => env(
-                        'OPENAI_MODEL',
-                        'gpt-4.1-mini'
-                    ),
+                    'model' => $model,
                     'messages' => [
                         [
                             'role' => 'system',
-                            'content' =>
-                            'You are an expert e-commerce SEO content writer. Return only valid JSON without markdown.',
+                            'content' => $systemPrompt,
                         ],
                         [
                             'role' => 'user',
                             'content' =>
                             "Generate the following for product '{$productName}' in category '{$categoryName}'.
 
-1. Product Description (Maximum 120 words)
-2. Short Product Description (Maximum 40 words)
+1. Product Description (Maximum {$descriptionLength} words)
+2. Short Product Description (Maximum {$shortDescriptionLength} words)
 3. SEO Meta Title (Maximum 60 characters)
 4. SEO Meta Description (Maximum 160 characters)
-5. SEO Meta Keywords (Comma separated)
-
+5. Generate exactly {$keywordCount} comma-separated SEO keywords.
+Write the complete content in {$writingTone} tone.
 Return ONLY valid JSON in the following format:
-
 {
 \"description\": \"\",
 \"short_description\": \"\",
@@ -53,13 +59,12 @@ Return ONLY valid JSON in the following format:
 \"meta_description\": \"\",
 \"meta_keywords\": \"\"
 }"
-                        ]
+                        ],
                     ],
-                    'temperature' => 0.7,
-                    'max_tokens' => 600,
+                    'temperature' => $temperature,
+                    'max_tokens' => $maxTokens,
                 ]
             );
-
             /*
         |--------------------------------------------------------------------------
         | API Error Handling
@@ -75,7 +80,6 @@ Return ONLY valid JSON in the following format:
                     'Unable to generate AI content.'
                 ];
             }
-
             /*
         |--------------------------------------------------------------------------
         | Decode JSON Response
