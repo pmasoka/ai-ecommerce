@@ -10,6 +10,8 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
 use App\Models\Category;
+use Filament\Actions\Action;
+use App\Services\Frontend\AIService;
 
 class CategoryForm
 {
@@ -21,7 +23,8 @@ class CategoryForm
                 ->label('Category Name')
                 ->required()
                 ->live(onBlur: true)
-                ->afterStateUpdated(fn ($state, callable $set) =>
+                ->afterStateUpdated(
+                    fn($state, callable $set) =>
                     $set('slug', Str::slug($state))
                 ),
 
@@ -35,7 +38,75 @@ class CategoryForm
                 ->nullable(),
 
             Textarea::make('description')
-                ->rows(3),
+                ->rows(3)
+                ->hintActions([
+                    Action::make(
+                        'generateDescription'
+                    )
+                        ->label(
+                            'Generate Using AI'
+                        )
+                        ->icon(
+                            'heroicon-o-sparkles'
+                        )
+                        ->action(
+                            function (
+                                $get,
+                                $set
+                            ) {
+                                $categoryName =
+                                    $get('name');
+                                if (
+                                    empty($categoryName)
+                                ) {
+                                    return;
+                                }
+                                $parentCategory = '';
+                                if (
+                                    $get(
+                                        'parent_id'
+                                    )
+                                ) {
+                                    $parentCategory =
+                                        Category::find(
+                                            $get(
+                                                'parent_id'
+                                            )
+                                        )?->name;
+                                }
+                                $content =
+                                    app(
+                                        AIService::class
+                                    )
+                                    ->generateCategoryContent(
+                                        $categoryName,
+                                        $parentCategory
+                                    );
+                                if (
+                                    ! isset(
+                                        $content['error']
+                                    )
+                                ) {
+                                    $set(
+                                        'description',
+                                        $content['description'] ?? ''
+                                    );
+                                    $set(
+                                        'meta_title',
+                                        $content['meta_title'] ?? ''
+                                    );
+                                    $set(
+                                        'meta_description',
+                                        $content['meta_description'] ?? ''
+                                    );
+                                    $set(
+                                        'meta_keywords',
+                                        $content['meta_keywords'] ?? ''
+                                    );
+                                }
+                            }
+                        ),
+                ]),
 
             FileUpload::make('image')
                 ->image()

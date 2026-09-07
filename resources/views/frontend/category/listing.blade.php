@@ -1,11 +1,25 @@
 @extends('frontend.layouts.app')
 
-@section('title', $category->name)
+@section('title', $category->meta_title ?: $category->name)
+
+@section('meta_description', $category->meta_description)
+
+@section('meta_keywords', $category->meta_keywords)
 
 @section('content')
+
     <div id="mainBody">
         <div class="container">
             <div class="row">
+                <div class="span12">
+                    
+                    <h3>{{ $category->name }}</h3>
+                    @if ($category->description)
+                        <div class="well">
+                            {!! nl2br(e($category->description)) !!}
+                        </div>
+                    @endif
+                </div>
                 {{-- Filters Sidebar --}}
                 <div class="span3">
                     @include('frontend.category.partials.filters')
@@ -93,10 +107,10 @@
                 });
 
                 /*
-        |--------------------------------------------------------------------------
-        | NEW: Selected Attributes
-        |--------------------------------------------------------------------------
-        */
+                |--------------------------------------------------------------------------
+                | NEW: Selected Attributes
+                |--------------------------------------------------------------------------
+                */
 
                 $('.attribute-filter:checked').each(function() {
                     attributes.push($(this).val());
@@ -129,10 +143,10 @@
                 }
 
                 /*
-    |--------------------------------------------------------------------------
-    | NEW: Multiple Dynamic Attribute Filters
-    |--------------------------------------------------------------------------
-    */
+            |--------------------------------------------------------------------------
+            | NEW: Multiple Dynamic Attribute Filters
+            |--------------------------------------------------------------------------
+            */
 
                 if (attributes.length > 0) {
                     params.set('attribute_values', attributes.join(','));
