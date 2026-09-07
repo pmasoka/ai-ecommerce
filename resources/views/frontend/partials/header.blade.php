@@ -73,8 +73,9 @@
                         @endforeach
                     </ul>
 
-                    <form class="navbar-search pull-left">
-                        <input type="text" class="search-query span2" placeholder="Search">
+                    <form action="{{ route('search') }}" method="GET" class="navbar-search pull-left">
+                        <input type="text" name="q" class="search-query span3"
+                            placeholder="Search products or describe what you need..." value="{{ request('q') }}">
                     </form>
 
                     <ul class="nav pull-right">
