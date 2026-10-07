@@ -2,6 +2,8 @@
 
 namespace App\Services\Frontend;
 
+use App\Models\Brand;
+use App\Models\Category;
 use App\Models\Product;
 
 class ProductService
@@ -225,6 +227,101 @@ NEW: Size Filters
                         "%{$keyword}%"
                     );
             })
+            ->latest()
+            ->take($limit)
+            ->get();
+    }
+    // AI Product Search
+
+    public function searchProductsUsingFilters(
+        array $filters,
+        int $limit = 20
+    ) {
+        $query = Product::query();
+        /*
+Brand
+*/
+        if (!empty($filters['brand'])) {
+            $brand = Brand::where(
+                'name',
+                'LIKE',
+                '%' . $filters['brand'] . '%'
+            )->first();
+            if ($brand) {
+                $query->where(
+                    'brand_id',
+                    $brand->id
+                );
+            }
+        }
+        /*
+Category
+*/
+        if (!empty($filters['category'])) {
+            $categoryIds = Category::where(
+                'name',
+                'LIKE',
+                '%' . $filters['category'] . '%'
+            )->pluck('id');
+            if ($categoryIds->isNotEmpty()) {
+                $childCategoryIds = Category::whereIn(
+                    'parent_id',
+                    $categoryIds
+                )->pluck('id');
+                $categoryIds = $categoryIds
+                    ->merge($childCategoryIds)
+                    ->unique();
+                $query->whereIn(
+                    'category_id',
+                    $categoryIds
+                );
+            }
+        }
+        /*
+Minimum Price
+*/
+        if (!is_null($filters['min_price'])) {
+            $query->where(
+                'price',
+                '>=',
+                $filters['min_price']
+            );
+        }
+        /*
+Maximum Price
+*/
+        if (!is_null($filters['max_price'])) {
+            $query->where(
+                'price',
+                '<=',
+                $filters['max_price']
+            );
+        }
+        /*
+Keywords
+*/
+        if (!empty($filters['keywords'])) {
+            foreach ($filters['keywords'] as $keyword) {
+                $query->where(function ($q) use ($keyword) {
+                    $q->where(
+                        'name',
+                        'LIKE',
+                        "%{$keyword}%"
+                    )
+                        ->orWhere(
+                            'description',
+                            'LIKE',
+                            "%{$keyword}%"
+                        )
+                        ->orWhere(
+                            'short_description',
+                            'LIKE',
+                            "%{$keyword}%"
+                        );
+                });
+            }
+        }
+        return $query
             ->latest()
             ->take($limit)
             ->get();

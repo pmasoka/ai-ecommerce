@@ -8,26 +8,49 @@ use Illuminate\Http\Request;
 
 class SearchController extends Controller
 {
-    protected $ProductService;
+       protected $productService;
+    protected $aiService;
+
     public function __construct(
         ProductService $productService
     ) {
-        $this->ProductService =
+        $this->productService =
             $productService;
     }
     /*
-|--------------------------------------------------------
-| Product Search
-|--------------------------------------------------------
+Product Search
 */
-    public function index(Request $request)
-    {
-        $keyword = trim($request->q);
+    public function index(
+        Request $request
+    ) {
+        $keyword = trim(
+            $request->q
+        );
         $products = collect();
         if (!empty($keyword)) {
+            /*
+Traditional Keyword Search
+*/
             $products =
-                $this->ProductService
-                ->searchProducts($keyword);
+                $this->productService
+                ->searchProducts(
+                    $keyword
+                );
+            /*
+AI Search
+*/
+            if ($products->isEmpty()) {
+                $filters =
+                    $this->aiService
+                    ->extractSearchFilters(
+                        $keyword
+                    );
+                $products =
+                    $this->productService
+                    ->searchProductsUsingFilters(
+                        $filters
+                    );
+            }
         }
         return view(
             'frontend.search.index',
